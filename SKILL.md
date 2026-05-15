@@ -3,9 +3,10 @@ name: nmti-evaluation
 description: >-
   Conducts the NMTI（牛马 TI）16-type workplace personality quiz from situational
   questions, computes four-dimension scores with tie-break rules, and outputs a
-  structured Markdown result report. Use when the user
-  runs NMTI、牛马 TI、职场人格测评、nmti-evaluation skill，或需要在答题后生成测评报告。
-disable-model-invocation: true
+  structured Markdown result report. Starts an interactive chat: opening line,
+  then Q1–Q16 from the question bank (or all at once if the user prefers), then
+  the report—do not emit the full report before answers exist. Use when the user
+  runs NMTI、牛马 TI、职场人格测评、nmti-evaluation skill，要做测评问卷、出题或生成测评报告。
 ---
 
 # NMTI 测评报告 Skill
@@ -20,6 +21,19 @@ disable-model-invocation: true
 ## 产品边界（口径）
 
 NMTI 为娱乐化职场情境测评，**不是**心理诊断或正规职业测评。报告末尾必须附带免责声明（见模板）。
+
+## 多轮对话编排（必填）
+
+Skill **必须以多轮对话形式执行**：本 Skill 进入当前会话上下文后的**第一条助手回复**，就要做完 **开场一句话**，并紧接着进入题目，任选其一：
+
+- **方式一**：立刻发出 **Q1** 在 `reference/questions.md` 中的**题干与四条选项原文**；
+- **方式二**：先问用户要「逐题」还是「一次列完全部 16 题」，再按选择执行。
+
+在用户**尚未给出**或可确认的 **16 题 A/B/C/D**（或本条消息明示「以下是我 16 题答案……」并已列全）之前，**禁止**输出最终版测评报告正文；允许只做规则说明或催答。
+
+仅在用户**同一条消息**里已经写清「Q1…Q16 各选哪一项」（或等价完整答案表）时，才可省略前面出题回合，直接进入计分与报告。
+
+若宿主环境的 `SKILL.md` 支持 `disable-model-invocation: true` 等类似开关：**不要**打开它，除非产品方刻意要求「仅限用户显式唤起才注入 Skill」——否则在多轮对话场景下，本测评可能**不会被自动选用**，用户将看不到出题流程。若已保持关闭仍无互动，请查阅**当前所用客户端**的 Skill / 规则文档，确认本会话已挂载本 Skill 或已由用户显式选用，再发送「做一下 NMTI / 牛马 TI 测评」等。
 
 ## 对话流程
 
